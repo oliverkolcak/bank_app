@@ -12,15 +12,15 @@ public class PayActivity extends AppCompatActivity {
     private EditText accountNumberEditText;
     private EditText amountEditText;
     private Button sendMoneyButton;
-
-    // Assuming a fixed balance for demonstration purposes.
-    // In a real application, you would store and retrieve this information securely.
-    private double userBalance = 1000.00; // User's balance in the bank account
+    private BalanceManager balanceManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_pay);
+
+        // Initialize BalanceManager
+        balanceManager = new BalanceManager(this);
 
         accountNumberEditText = findViewById(R.id.account_number);
         amountEditText = findViewById(R.id.amount);
@@ -32,16 +32,20 @@ public class PayActivity extends AppCompatActivity {
                 try {
                     String accountNumber = accountNumberEditText.getText().toString();
                     double amountToSend = Double.parseDouble(amountEditText.getText().toString());
+                    double userBalance = balanceManager.getBalance(); // Get the current balance
 
                     // Check if the user has enough money in the account
                     if (userBalance >= amountToSend) {
                         // Deduct the amount from the user's balance
-                        userBalance -= amountToSend;
+                        balanceManager.setBalance(userBalance - amountToSend); // Save the new balance
 
                         // For demonstration purposes only: show the remaining balance
-                        Toast.makeText(PayActivity.this, "Payment successful! Remaining balance: $" + userBalance, Toast.LENGTH_LONG).show();
+                        Toast.makeText(PayActivity.this, "Payment successful! Remaining balance: $" + balanceManager.getBalance(), Toast.LENGTH_LONG).show();
 
-                        // TODO: Here you would implement the actual transaction logic to send the money
+                        // Set the result as OK and finish the activity to return to WelcomeActivity
+                        setResult(RESULT_OK);
+                        finish();
+
                     } else {
                         Toast.makeText(PayActivity.this, "Insufficient funds.", Toast.LENGTH_LONG).show();
                     }
